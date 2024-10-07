@@ -47,6 +47,8 @@ function keyDown(event) {
 function tick() {
     if (gameOver) {
         console.log(`Game over! Score: ${score}`);
+        alert(`Game over! Score: ${score}`);
+        window.location.reload(); // reload the page
         return;
     }
     setTimeout(tick, 100);
@@ -103,7 +105,9 @@ function tick() {
         displayScore(score);
         console.log(`Score: ${score}`);
 
-        displayFood();
+        setTimeout(() => {
+            displayFood();
+        }, 1000);
     }
 
     queue.enqueue(head);
@@ -130,6 +134,27 @@ function checkIfSnakeIsInCell(row, col) {
         node = node.next;
     }
     return false;
+}
+
+function updateGrid() {
+    const cells = document.querySelectorAll("#grid .cell");
+    for (let row = 0; row < GRID_HEIGHT; row++) {
+        for (let col = 0; col < GRID_WIDTH; col++) {
+            const index = row * GRID_WIDTH + col;
+
+            switch (grid.get(row, col)) {
+                case 0:
+                    cells[index].classList.remove("player", "goal");
+                    break;
+                case 1: // Note: doesn't remove goal if previously set
+                    cells[index].classList.add("player");
+                    break;
+                case 2: // Note: doesn't remove player if previously set
+                    cells[index].classList.add("goal");
+                    break;
+            }
+        }
+    }
 }
 // #endregion controller
 
@@ -187,26 +212,5 @@ function displayFood() {
 function displayScore(score) {
     const scoreElement = document.querySelector("#score");
     scoreElement.textContent = `Score: ${score}`;
-}
-
-function updateGrid() {
-    const cells = document.querySelectorAll("#grid .cell");
-    for (let row = 0; row < GRID_HEIGHT; row++) {
-        for (let col = 0; col < GRID_WIDTH; col++) {
-            const index = row * GRID_WIDTH + col;
-
-            switch (grid.get(row, col)) {
-                case 0:
-                    cells[index].classList.remove("player", "goal");
-                    break;
-                case 1: // Note: doesn't remove goal if previously set
-                    cells[index].classList.add("player");
-                    break;
-                case 2: // Note: doesn't remove player if previously set
-                    cells[index].classList.add("goal");
-                    break;
-            }
-        }
-    }
 }
 // #endregion view
