@@ -53,7 +53,7 @@ function tick() {
 
     let current = queue.head;
     while (current) {
-        writeToCell(current.data.row, current.data.col, 0);
+        grid.set(current.data.row, current.data.col, 0);
         current = current.next;
     }
     const head = {
@@ -102,7 +102,7 @@ function tick() {
 
 
 
-    if (readFromCell(head.row, head.col) === 2) {
+    if (grid.get(head.row, head.col) === 2) {
         queue.enqueue({ row: queue.tail.data.row, col: queue.tail.data.col });
         displayScore(score++)
         console.log(`Score: ${score}`);
@@ -114,7 +114,7 @@ function tick() {
 
     current = queue.head;
     while (current) {
-        writeToCell(current.data.row, current.data.col, 1);
+        grid.set(current.data.row, current.data.col, 1);
         current = current.next;
     }
 
@@ -127,7 +127,7 @@ function tick() {
 
 
 function createTheGrid() {
-    grid = Array.from({ length: GRID_HEIGHT }, () => Array(GRID_WIDTH).fill(0));
+    grid = new Grid(GRID_HEIGHT, GRID_WIDTH);
 }
 
 let queue = new Queue();
@@ -166,7 +166,7 @@ function displayGoal() {
     const col = Math.floor(Math.random() * GRID_WIDTH);
     console.log(`row: ${row}, col: ${col}`);
     
-    writeToCell(row, col, 2);
+    grid.set(row, col, 2);
 }
 
 function displayScore(score) {
@@ -180,7 +180,7 @@ function updateGrid() {
         for (let col = 0; col < GRID_WIDTH; col++) {
             const index = row * GRID_WIDTH + col;
 
-            switch (readFromCell(row, col)) {
+            switch (grid.get(row, col)) {
                 case 0:
                     cells[index].classList.remove("player", "goal");
                     break;
