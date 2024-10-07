@@ -83,13 +83,4 @@ class Node {
      }
  }
 
-let queue = new Queue();
-queue.enqueue({ row: 0, col: 0 });
-queue.enqueue({ row: 0, col: 1 });
-queue.enqueue({ row: 0, col: 2 });
-queue.enqueue({ row: 0, col: 3 });
-console.log(queue.getHead());
-console.log(queue.peek());
-console.log(queue.getTail());
-
 

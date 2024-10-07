@@ -5,7 +5,7 @@ window.addEventListener("load", init);
 
 const GRID_HEIGHT = 20;
 const GRID_WIDTH = 30;
-let direction;
+let direction = "right";
 let score = 0;
 let grid;
 let gameOver = false;
@@ -13,7 +13,7 @@ let gameOver = false;
 function init() {
     console.log(`Init kører`);
     createTheGrid();
-    displayGoal();
+    displayFood();
     displayGrid();
     document.addEventListener("keydown", keyDown);
     tick();
@@ -56,17 +56,12 @@ function tick() {
         grid.set(current.data.row, current.data.col, 0);
         current = current.next;
     }
-    const head = {
+    let head = {
         row: queue.tail.data.row,
         col: queue.tail.data.col,
     };
 
-
-
-
     queue.dequeue();
-   
-    
 
     // Move the head based on the direction
     switch (direction) {
@@ -99,15 +94,16 @@ function tick() {
     }
 
     // Check if the head has hit the body
-
+    checkIfSnakeIsInCell(head.row, head.col);
 
     if (grid.get(head.row, head.col) === 2) {
         score++;
         queue.enqueue({ row: queue.tail.data.row, col: queue.tail.data.col });
-        displayScore(score)
+        grid.set(head.row, head.col, 1);
+        displayScore(score);
         console.log(`Score: ${score}`);
-        
-        displayGoal();
+
+        displayFood();
     }
 
     queue.enqueue(head);
@@ -120,14 +116,29 @@ function tick() {
 
     updateGrid();
 }
+
+function checkIfSnakeIsInCell(row, col) {
+    let node = queue.head;
+    while (node) {
+        if (node.data.row === row && node.data.col === col) {
+            if (node != queue.head) {
+                console.log("BANG - cell is inside snake");
+                gameOver = true;
+                return true;
+            }
+        }
+        node = node.next;
+    }
+    return false;
+}
 // #endregion controller
 
 // ****** MODEL ******
 // #region model
 
-
 function createTheGrid() {
     grid = new Grid(GRID_HEIGHT, GRID_WIDTH);
+    grid.fill(0);
 }
 
 let queue = new Queue();
@@ -135,6 +146,17 @@ queue.enqueue({ row: 5, col: 5 });
 queue.enqueue({ row: 5, col: 6 });
 queue.enqueue({ row: 5, col: 7 });
 
+function emptyCells() {
+    let emptyCells = [];
+    for (let row = 0; row < GRID_HEIGHT; row++) {
+        for (let col = 0; col < GRID_WIDTH; col++) {
+            if (grid.get(row, col) === 0) {
+                emptyCells.push({ row, col });
+            }
+        }
+    }
+    return emptyCells;
+}
 
 // #endregion model
 
@@ -155,12 +177,11 @@ function displayGrid() {
     }
 }
 
-function displayGoal() {
-    const row = Math.floor(Math.random() * GRID_HEIGHT);
-    const col = Math.floor(Math.random() * GRID_WIDTH);
-    console.log(`row: ${row}, col: ${col}`);
-    
-    grid.set(row, col, 2);
+function displayFood() {
+    let empty = emptyCells();
+    let randomIndex = Math.floor(Math.random() * empty.length);
+    let randomCell = empty[randomIndex];
+    grid.set(randomCell.row, randomCell.col, 2);
 }
 
 function displayScore(score) {
