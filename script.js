@@ -101,10 +101,10 @@ function tick() {
     // Check if the head has hit the body
 
 
-
     if (grid.get(head.row, head.col) === 2) {
+        score++;
         queue.enqueue({ row: queue.tail.data.row, col: queue.tail.data.col });
-        displayScore(score++)
+        displayScore(score)
         console.log(`Score: ${score}`);
         
         displayGoal();
@@ -135,13 +135,7 @@ queue.enqueue({ row: 5, col: 5 });
 queue.enqueue({ row: 5, col: 6 });
 queue.enqueue({ row: 5, col: 7 });
 
-function writeToCell(row, col, value) {
-    grid[row][col] = value;
-}
 
-function readFromCell(row, col) {
-    return grid[row][col];
-}
 // #endregion model
 
 // ****** VIEW ******
