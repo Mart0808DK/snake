@@ -28,3 +28,7 @@ body {
 .goal {
   background-color: rgb(211, 22, 8);
 }
+
+.obstacle {
+  background-color: #000000;
+}

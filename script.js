@@ -5,7 +5,7 @@ window.addEventListener("load", init);
 
 const GRID_HEIGHT = 20;
 const GRID_WIDTH = 30;
-let direction = "right";
+let currentDirection = "right";
 let score = 0;
 let grid;
 let gameOver = false;
@@ -21,23 +21,34 @@ function init() {
 
 // ****** CONTROLLER ******
 // #region controller
+function updateDirection(newDirection) {
+    if (
+        (currentDirection === "left" && newDirection !== "right") ||
+        (currentDirection === "right" && newDirection !== "left") ||
+        (currentDirection === "up" && newDirection !== "down") ||
+        (currentDirection === "down" && newDirection !== "up")
+    ) {
+        currentDirection = newDirection;
+    }
+}
+
 function keyDown(event) {
     switch (event.key) {
         case "ArrowLeft":
         case "a":
-            direction = "left";
+            updateDirection("left");
             break;
         case "ArrowRight":
         case "d":
-            direction = "right";
+            updateDirection("right");
             break;
         case "ArrowUp":
         case "w":
-            direction = "up";
+            updateDirection("up");
             break;
         case "ArrowDown":
         case "s":
-            direction = "down";
+            updateDirection("down");
             break;
         default:
             break;
@@ -54,6 +65,7 @@ function tick() {
     setTimeout(tick, 100);
 
     let current = queue.head;
+
     while (current) {
         grid.set(current.data.row, current.data.col, 0);
         current = current.next;
@@ -66,7 +78,7 @@ function tick() {
     queue.dequeue();
 
     // Move the head based on the direction
-    switch (direction) {
+    switch (currentDirection) {
         case "left":
             head.col--;
             if (head.col < 0) {
@@ -98,12 +110,20 @@ function tick() {
     // Check if the head has hit the body
     checkIfSnakeIsInCell(head.row, head.col);
 
+    if (grid.get(head.row, head.col) === 3) {
+        console.log("BANG - cell is inside obstacle");
+        gameOver = true;
+        return;
+        
+    }
+
     if (grid.get(head.row, head.col) === 2) {
-        score++;
+        score += 10;
         queue.enqueue({ row: queue.tail.data.row, col: queue.tail.data.col });
         grid.set(head.row, head.col, 1);
         displayScore(score);
         console.log(`Score: ${score}`);
+        displayObstacle();
 
         setTimeout(() => {
             displayFood();
@@ -144,13 +164,16 @@ function updateGrid() {
 
             switch (grid.get(row, col)) {
                 case 0:
-                    cells[index].classList.remove("player", "goal");
+                    cells[index].classList.remove("player", "goal", "obstacle");
                     break;
                 case 1: // Note: doesn't remove goal if previously set
                     cells[index].classList.add("player");
                     break;
                 case 2: // Note: doesn't remove player if previously set
                     cells[index].classList.add("goal");
+                    break;
+                case 3:
+                    cells[index].classList.add("obstacle");
                     break;
             }
         }
@@ -207,6 +230,13 @@ function displayFood() {
     let randomIndex = Math.floor(Math.random() * empty.length);
     let randomCell = empty[randomIndex];
     grid.set(randomCell.row, randomCell.col, 2);
+}
+
+function displayObstacle() {
+    let empty = emptyCells();
+    let randomIndex = Math.floor(Math.random() * empty.length);
+    let randomCell = empty[randomIndex];
+    grid.set(randomCell.row, randomCell.col, 3);
 }
 
 function displayScore(score) {
